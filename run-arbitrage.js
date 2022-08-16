@@ -11,7 +11,7 @@ const kyber = new web3.eth.Contract(
     addresses.kyber.kyberNetworkProxy
 );
 
-const AMOUNT_ETH = 25;
+const AMOUNT_ETH = 100;
 const RECENT_ETH_PRICE = 1900;
 const AMOUNT_ETH_WEI = web3.utils.toWei(AMOUNT_ETH.toString());
 const AMOUNT_DAI_WEI = web3.utils.toWei((AMOUNT_ETH * RECENT_ETH_PRICE).toString());
@@ -60,6 +60,12 @@ const init = async() => {
             daiWeth.getOutputAmount(new TokenAmount(weth, AMOUNT_ETH_WEI))
         ])
         console.log(uniswapResult);
+        const uniswapRates = {
+            buy: parseFloat(AMOUNT_DAI_WEI / (uniswapResult[0][0].toExact() * 10 ** 18)),
+            sell: parseFloat(uniswapResult[0][0].toExact() / AMOUNT_ETH)
+        }
+        console.log('UNISWAP ETH/DAI');
+        console.log(uniswapRates);
     })
     .on('error', error => {
         console.log(error);
