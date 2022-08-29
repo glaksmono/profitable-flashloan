@@ -12,11 +12,11 @@ const kyber = new web3.eth.Contract(
 );
 
 const AMOUNT_ETH = 100;
-const RECENT_ETH_PRICE = 1900;
+const RECENT_ETH_PRICE = 1500;
 const AMOUNT_ETH_WEI = web3.utils.toWei(AMOUNT_ETH.toString());
 const AMOUNT_DAI_WEI = web3.utils.toWei((AMOUNT_ETH * RECENT_ETH_PRICE).toString());
 
-const init = async() => {
+const init = async () => {
     const [dai, weth] = await Promise.all(
         [addresses.tokens.dai, addresses.tokens.weth].map(tokenAddress => (
             Fetcher.fetchTokenData(
@@ -29,11 +29,11 @@ const init = async() => {
         weth
     );
 
-    web3.eth.subscribe('newBlockHeaders')
-    .on('data', async block => {
+    web3.eth.subscribe('newBlockHeaders').on('data', async block => {
+
         console.log(`New block received. Block # ${block.number}`);
 
-        const kyberResult = await Promise.all([
+        const kyberResults = await Promise.all([
             kyber.methods.getExpectedRate(
                 addresses.tokens.dai,
                 '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
@@ -43,26 +43,30 @@ const init = async() => {
             kyber.methods.getExpectedRate(
                 '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
                 addresses.tokens.dai,
-                AMOUNT_DAI_WEI
+                AMOUNT_ETH_WEI
             ).call()
         ]);
 
         const kyberRates = {
-            buy: parseFloat(1 / (kyberResult[0].expectedRate / (10 ** 18))),
-            sell: parseFloat(kyberResult[1].expectedRate / (10 ** 18))
+            buy: parseFloat(1 / (kyberResults[0].expectedRate / (10 ** 18))),
+            sell: parseFloat(kyberResults[1].expectedRate / (10 ** 18))
         }
-        console.log(kyberResult);
+        console.log(kyberResults);
         console.log('KYBER ETH/DAI');
         console.log(kyberRates);
 
-        const uniswapResult = await Promise.all([
+        //----- UNISWAP START HERE -----//
+
+        const uniswapResults = await Promise.all([
             daiWeth.getOutputAmount(new TokenAmount(dai, AMOUNT_DAI_WEI)),
             daiWeth.getOutputAmount(new TokenAmount(weth, AMOUNT_ETH_WEI))
         ])
-        console.log(uniswapResult);
+        
+        console.log(uniswapResults);
+
         const uniswapRates = {
-            buy: parseFloat(AMOUNT_DAI_WEI / (uniswapResult[0][0].toExact() * 10 ** 18)),
-            sell: parseFloat(uniswapResult[0][0].toExact() / AMOUNT_ETH)
+            buy: parseFloat(AMOUNT_DAI_WEI / (uniswapResults[0][0].toExact() * 10 ** 18)),
+            sell: parseFloat(uniswapResults[1][0].toExact() / AMOUNT_ETH)
         }
         console.log('UNISWAP ETH/DAI');
         console.log(uniswapRates);
