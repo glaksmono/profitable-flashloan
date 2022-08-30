@@ -1,3 +1,5 @@
+require('dotenv').config();
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -96,6 +98,14 @@ module.exports = {
     //   network_id: 2111,   // This network is yours, in the cloud.
     //   production: true    // Treats this network as if it was a public net. (default: false)
     // }
+
+    mainet: {
+      provider: () => new HDWalletProvider(
+        process.env.PRIVATE_KEY,
+        process.env.INFURA_URL
+      ),
+      network_id: 1
+    }
   },
 
   // Set default mocha options here, use special reporters, etc.
@@ -106,7 +116,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.16",      // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.5.7",      // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
       //  optimizer: {
