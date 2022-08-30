@@ -99,12 +99,12 @@ module.exports = {
     //   production: true    // Treats this network as if it was a public net. (default: false)
     // }
 
-    mainet: {
+    mainnet: {
       provider: () => new HDWalletProvider(
         process.env.PRIVATE_KEY,
         process.env.INFURA_URL
       ),
-      network_id: 1
+      network_id: 1, // mainnet
     }
   },
 
