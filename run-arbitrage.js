@@ -6,7 +6,7 @@ const {mainnet: addresses } = require('./addresses');
 const Flashloan = require("./build/contracts/Flashloan.json");
 
 const web3 = new Web3(
-    new Web3.providers.WebSocketProviders(process.env.INFURA_URL)
+    new Web3.providers.WebsocketProvider(process.env.INFURA_URL)
 );
 const {address: admin} = web3.eth.accounts.wallet.add(process.env.PRIVATE_KEY);
 
@@ -31,15 +31,15 @@ const init = async () => {
 
     let ethPrice;
     const updateEthPrice = async () => {
-      const results = await kyber
-        .methods
-        .getExpectedRate(
-          '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 
-          addresses.tokens.dai, 
-          1
-        )
-        .call();
-      ethPrice = web3.utils.toBN('1').mul(web3.utils.toBN(results.expectedRate)).div(ONE_WEI);
+        const results = await kyber
+            .methods
+            .getExpectedRate(
+                '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 
+                addresses.tokens.dai, 
+                1
+            )
+            .call();
+        ethPrice = web3.utils.toBN('1').mul(web3.utils.toBN(results.expectedRate)).div(ONE_WEI);
     }
     await updateEthPrice();
     setInterval(updateEthPrice, 15000);
